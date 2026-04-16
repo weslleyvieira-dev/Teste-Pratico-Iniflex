@@ -3,6 +3,7 @@ package code;
 import java.util.List;
 import java.util.Locale;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
@@ -111,23 +113,38 @@ public class Main {
   }
 
   public void listarFuncionariosPorIdade(Integer qtd) {
-    funcionarios.sort((f1, f2) -> f1.getDataNascimento().compareTo(f2.getDataNascimento()));
+    List<Funcionario> listaOrdenada = funcionarios.stream()
+        .sorted(Comparator.comparing(Funcionario::getDataNascimento))
+        .toList();
+
     System.out.println("3.9 - Funcionário(s) mais velho(s):");
-    for (int i = 0; i < qtd && i < funcionarios.size(); i++) {
-      Funcionario f = funcionarios.get(i);
+    for (int i = 0; i < qtd && i < listaOrdenada.size(); i++) {
+      Funcionario f = listaOrdenada.get(i);
       String nome = f.getNome();
-      Integer anoNascimento = f.getDataNascimento().getYear();
-      Integer anoAtual = LocalDate.now().getYear();
-      Integer idade = anoAtual - anoNascimento;
+      LocalDate anoNascimento = f.getDataNascimento();
+      LocalDate anoAtual = LocalDate.now();
+      Integer idade = Period.between(anoNascimento, anoAtual).getYears();
       System.out.printf("%-8s | %s%n", nome, idade);
     }
     System.out.println("-------------------------------------------------------");
   }
 
   public void listarFuncionariosAlfabeticamente() {
-    funcionarios.sort((f1, f2) -> f1.getNome().compareTo(f2.getNome()));
+    List<Funcionario> listaOrdenada = funcionarios.stream().sorted(Comparator.comparing(Funcionario::getNome))
+        .toList();
     System.out.println("3.10 - Funcionários ordenados alfabeticamente:");
-    listarFuncionarios();
+
+    System.out.println("-------------------------------------------------------");
+    System.out.println("Nome     | Data Nascimento | Salário    | Função");
+    System.out.println("-------------------------------------------------------");
+    for (Funcionario f : listaOrdenada) {
+      String nome = f.getNome();
+      String formattedDate = f.getDataNascimento().format(formatter);
+      String salario = numberFormat.format(f.getSalario());
+      String funcao = f.getFuncao();
+      System.out.printf("%-8s | %-15s | %-10s | %-10s %n", nome, formattedDate, salario, funcao);
+    }
+    System.out.println("-------------------------------------------------------");
   }
 
   public void calculaTotalSalarios() {
