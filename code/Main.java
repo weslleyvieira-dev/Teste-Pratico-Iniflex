@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
@@ -19,6 +18,7 @@ public class Main {
   List<Funcionario> funcionarios = new ArrayList<>();
   static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
   static NumberFormat numberFormat = NumberFormat.getInstance(Locale.of("pt", "BR"));
+  private static final BigDecimal SALARIO_MINIMO = new BigDecimal("1212.00");
 
   public static void main(String[] args) {
     System.out.println("-------------------------------------------------------");
@@ -100,12 +100,11 @@ public class Main {
   }
 
   public void listarFuncionariosPorAniversario(Integer mes) {
-    System.out.printf("3.8 - Listando aniversários do mês %s:\n", mes);
+    System.out.printf("3.8 - Listando aniversários do mês %s!\n", mes);
     for (Funcionario f : funcionarios) {
       String nome = f.getNome();
       String formattedDate = f.getDataNascimento().format(formatter);
-      Month mesAniversario = f.getDataNascimento().getMonth();
-      if (mesAniversario.getValue() == mes) {
+      if (f.getDataNascimento().getMonthValue() == mes) {
         System.out.printf("%-8s | %-15s%n", nome, formattedDate);
       }
     }
@@ -117,13 +116,11 @@ public class Main {
         .sorted(Comparator.comparing(Funcionario::getDataNascimento))
         .toList();
 
-    System.out.println("3.9 - Funcionário(s) mais velho(s):");
+    System.out.println("3.9 - Funcionário mais velho!");
     for (int i = 0; i < qtd && i < listaOrdenada.size(); i++) {
       Funcionario f = listaOrdenada.get(i);
       String nome = f.getNome();
-      LocalDate anoNascimento = f.getDataNascimento();
-      LocalDate anoAtual = LocalDate.now();
-      Integer idade = Period.between(anoNascimento, anoAtual).getYears();
+      Integer idade = Period.between(f.getDataNascimento(), LocalDate.now()).getYears();
       System.out.printf("%-8s | %s%n", nome, idade);
     }
     System.out.println("-------------------------------------------------------");
@@ -132,7 +129,7 @@ public class Main {
   public void listarFuncionariosAlfabeticamente() {
     List<Funcionario> listaOrdenada = funcionarios.stream().sorted(Comparator.comparing(Funcionario::getNome))
         .toList();
-    System.out.println("3.10 - Funcionários ordenados alfabeticamente:");
+    System.out.println("3.10 - Funcionários ordenados alfabeticamente!");
 
     System.out.println("-------------------------------------------------------");
     System.out.println("Nome     | Data Nascimento | Salário    | Função");
@@ -148,7 +145,7 @@ public class Main {
   }
 
   public void calculaTotalSalarios() {
-    System.out.println("3.11 - Salário total dos funcionários:");
+    System.out.println("3.11 - Salário total dos funcionários!");
     BigDecimal somaSalarios = BigDecimal.ZERO;
 
     for (int i = 0; i < funcionarios.size(); i++) {
@@ -160,12 +157,11 @@ public class Main {
   }
 
   public void calculaTotalSalariosMinimos() {
-    System.out.println("3.12 - Lista a quantidade de salários mínimos ganhos por cada funcionário");
-    BigDecimal salarioMinimo = new BigDecimal("1212.00");
+    System.out.println("3.12 - Quantidade de salários mínimos ganhos por cada funcionário!");
 
     for (Funcionario f : funcionarios) {
       String nome = f.getNome();
-      BigDecimal totalSalariosMinimos = f.getSalario().divide(salarioMinimo, 2, RoundingMode.HALF_UP);
+      BigDecimal totalSalariosMinimos = f.getSalario().divide(SALARIO_MINIMO, 2, RoundingMode.HALF_UP);
       System.out.printf("%-8s | %-10s%n", nome, totalSalariosMinimos);
     }
     System.out.println("-------------------------------------------------------");
